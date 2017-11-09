@@ -70,10 +70,11 @@ $(document).ready(function() {
             method: 'GET'
         }).then(function(response) {
             response.json().then(function(data) {
-
-                if (!data) $('.cityWeather').html(`Wrong city selected`);
-                $('.cityWeather').html(`Current weather: ${data.currently.summary}`);
                 cache[`${tempCacheInfo}`]['weather'] = `${data.currently.summary}`;
+                cache[`${tempCacheInfo}`]['temperature'] = `${parseInt((data.currently.temperature - 32)/1.8)}°C`;
+                if (!data) $('.cityWeather').html(`Wrong city selected`);
+                $('.cityWeather').html(`Current weather: ${cache[`${tempCacheInfo}`]['weather']}`);
+                $('.temperature').html(`Temperature: ${cache[`${tempCacheInfo}`]['temperature']}`)
             });
         }).catch(err => console.log(err));
     }

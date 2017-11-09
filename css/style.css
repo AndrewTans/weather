@@ -1,9 +1,15 @@
-body{
-	max-width: 500px;
-	text-align: center;
-	margin: auto;
+body {
+    max-width: 500px;
+    text-align: center;
+    margin: auto;
 }
 
-button{
-	margin-top: 5px;
+button {
+    margin-top: 5px;
+}
+
+.temperature {
+	margin: 5px;
+	font-size: 16px;
+	font-weight: 700;
 }
