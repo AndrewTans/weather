@@ -40,7 +40,7 @@ $(document).ready(function() {
     function showPosition(position) {
         userPosition = `${position.coords.latitude},${position.coords.longitude}`;
 
-        getCityInfo(getCityUrl(userPosition));;
+        getCityInfo(getCityUrl(userPosition));
     }
 
     function getCityInfo(url) {
