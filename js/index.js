@@ -3,11 +3,22 @@ $(document).ready(function() {
     let userPosition, getUrl, getCity, userCityUrl, locationInfo;
     let apiKey = `AIzaSyA6xFVX1XWs7KZbBQ_2vxZ-SMqyhfkz1No`
     let apiLocationKey = `AIzaSyBzoB6Z3mEO1a7tjJLGgRnCC1BUvNEo6ss`;
+    let tempCacheInfo = '';
+    let cache = {};
+
+        getLocation();
 
     $('button').on('click', function(event) {
-        console.log($('#city').val());
+
         let inputCity = $('#city').val();
         userCityUrl = `https://cors.io/?https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${inputCity}&types=geocode&key=${apiLocationKey}`;
+        
+        if (cache[`${inputCity}`]) {
+        	console.log('WOWOWO');
+        	$('.userCity').html(`Current city: ${cache[`${inputCity}`]['name']}`);
+        	$('.cityWeather').html(`Current weather: ${cache[`${inputCity}`]['weather']}`);
+        	return
+        }
         getCityLocation(userCityUrl);
     });
 
@@ -30,33 +41,34 @@ $(document).ready(function() {
 
     function showPosition(position) {
         userPosition = `${position.coords.latitude},${position.coords.longitude}`;
+
         getCityInfo(getCityUrl(userPosition));
-        getWeather(getWeatherUrl(userPosition));
-    }
-
-    getLocation();
-
-    function getWeather(url) {
-        fetch(url, {
-            method: 'GET'
-        }).then(function(response) {
-            response.json().then(function(data) {
-                if (!data) return $('.cityWeather').html(`Wrong city selected`);
-                $('.cityWeather').html(`Current weather: ${data.currently.summary}<br>
-                						timezone: ${data.timezone}`);
-            });
-        }).catch(err => console.log(err));
-    }
+;    }
 
     function getCityInfo(url) {
         fetch(url, {
             method: 'GET'
         }).then(function(response) {
             response.json().then(function(data) {
-                if (!data) return $('.userCity').html(`Could't show city`);
-                console.log(data);
-                $('.userCity').html(`Current city: ${data.results[0].address_components[3].long_name}`);
-            })
+                if (!data) $('.userCity').html(`Could't show city`);
+
+                tempCacheInfo = data.results[0].address_components[3].long_name;
+                cache[`${tempCacheInfo}`] = {name: tempCacheInfo};
+                $('.userCity').html(`Current city: ${tempCacheInfo}`);
+            }).then(getWeather(getWeatherUrl(userPosition)))
+        }).catch(err => console.log(err));
+    }
+
+        function getWeather(url) {
+        fetch(url, {
+            method: 'GET'
+        }).then(function(response) {
+            response.json().then(function(data) {
+                if (!data) $('.cityWeather').html(`Wrong city selected`);
+                $('.cityWeather').html(`Current weather: ${data.currently.summary}`);
+                cache[`${tempCacheInfo}`]['weather'] = `${data.currently.summary}`;
+                console.log(cache);
+            });
         }).catch(err => console.log(err));
     }
 
@@ -66,8 +78,11 @@ $(document).ready(function() {
             method: 'GET'
         }).then(function(response) {
             response.json().then(function(data) {
-            	console.log(data);
-                if (!data) return $('.userCity').html(`Wrong city selected`);
+                if (data.predictions.length === 0) {
+                	$('.userCity').html(`Wrong city selected`);
+                	$('.cityWeather').html(``);
+                	throw new Error('Wrong city selected!');
+                };
                 return tempId = data.predictions[0].place_id;
             }).then(getCityById);
         }).catch(err => console.log(err));
@@ -75,7 +90,7 @@ $(document).ready(function() {
 
 
     var getCityById = function(tempId) {
-        console.log(tempId);
+
         fetch(`https://cors.io/?https://maps.googleapis.com/maps/api/place/details/json?placeid=${tempId}&key=${apiLocationKey}`, {
             method: 'GET'
         }).then(function(response) {
@@ -87,7 +102,6 @@ $(document).ready(function() {
                 }
 
                 getCityInfo(getCityUrl(newLocation.toString()));
-                getWeather(getWeatherUrl(newLocation.toString()));
             });
         })
     }
