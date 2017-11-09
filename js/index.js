@@ -6,24 +6,22 @@ $(document).ready(function() {
     let tempCacheInfo = '';
     let cache = {};
 
-        getLocation();
+    getLocation();
 
     $('button').on('click', function(event) {
 
         let inputCity = $('#city').val();
         userCityUrl = `https://cors.io/?https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${inputCity}&types=geocode&key=${apiLocationKey}`;
-        
+
         if (cache[`${inputCity}`]) {
-        	console.log('WOWOWO');
-        	$('.userCity').html(`Current city: ${cache[`${inputCity}`]['name']}`);
-        	$('.cityWeather').html(`Current weather: ${cache[`${inputCity}`]['weather']}`);
-        	return
+            $('.userCity').html(`Current city: ${cache[`${inputCity}`]['name']}`);
+            $('.cityWeather').html(`Current weather: ${cache[`${inputCity}`]['weather']}`);
+            return
         }
         getCityLocation(userCityUrl);
     });
 
     function getLocation() {
-        console.log(navigator.geolocation);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
         } else {
@@ -42,32 +40,39 @@ $(document).ready(function() {
     function showPosition(position) {
         userPosition = `${position.coords.latitude},${position.coords.longitude}`;
 
-        getCityInfo(getCityUrl(userPosition));
-;    }
+        getCityInfo(getCityUrl(userPosition));;
+    }
 
     function getCityInfo(url) {
         fetch(url, {
             method: 'GET'
         }).then(function(response) {
             response.json().then(function(data) {
-                if (!data) $('.userCity').html(`Could't show city`);
 
+                if (!data) $('.userCity').html(`Could't show city`);
                 tempCacheInfo = data.results[0].address_components[3].long_name;
-                cache[`${tempCacheInfo}`] = {name: tempCacheInfo};
+
+                for (let i = 0; i < data.results[0].address_components.length; i++) {
+                    if (data.results[0].address_components[i].types[0] == 'locality') {
+                        tempCacheInfo = data.results[0].address_components[i].long_name;
+                        break;
+                    }
+                }
+                cache[`${tempCacheInfo}`] = { name: tempCacheInfo };
                 $('.userCity').html(`Current city: ${tempCacheInfo}`);
             }).then(getWeather(getWeatherUrl(userPosition)))
         }).catch(err => console.log(err));
     }
 
-        function getWeather(url) {
+    function getWeather(url) {
         fetch(url, {
             method: 'GET'
         }).then(function(response) {
             response.json().then(function(data) {
+
                 if (!data) $('.cityWeather').html(`Wrong city selected`);
                 $('.cityWeather').html(`Current weather: ${data.currently.summary}`);
                 cache[`${tempCacheInfo}`]['weather'] = `${data.currently.summary}`;
-                console.log(cache);
             });
         }).catch(err => console.log(err));
     }
@@ -79,9 +84,9 @@ $(document).ready(function() {
         }).then(function(response) {
             response.json().then(function(data) {
                 if (data.predictions.length === 0) {
-                	$('.userCity').html(`Wrong city selected`);
-                	$('.cityWeather').html(``);
-                	throw new Error('Wrong city selected!');
+                    $('.userCity').html(`Wrong city selected`);
+                    $('.cityWeather').html(``);
+                    throw new Error('Wrong city selected!');
                 };
                 return tempId = data.predictions[0].place_id;
             }).then(getCityById);
@@ -102,6 +107,7 @@ $(document).ready(function() {
                 }
 
                 getCityInfo(getCityUrl(newLocation.toString()));
+                userPosition = newLocation.toString();
             });
         })
     }
