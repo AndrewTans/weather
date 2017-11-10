@@ -17,6 +17,7 @@ $(document).ready(function() {
         if (cache[`${inputCity}`]) {
             $('.userCity').html(`Current city: ${cache[`${inputCity}`]['name']}`);
             $('.cityWeather').html(`Current weather: ${cache[`${inputCity}`]['weather']}`);
+            $('.temperature').html(`Temperature: ${cache[`${inputCity}`]['temperature']}`)
             return
         }
         getCityLocation(userCityUrl);
