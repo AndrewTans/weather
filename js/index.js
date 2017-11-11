@@ -11,7 +11,7 @@ $(document).ready(function() {
     $('button').on('click', function(event) {
 
         let inputCity = $('#city').val();
-        userCityUrl = `https://cors.io/?https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${inputCity}&types=geocode&key=${apiLocationKey}`;
+        userCityUrl = `https://crossorigin.me/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${inputCity}&types=geocode&key=${apiLocationKey}`;
 
         // check if its on cache already
         if (cache[`${inputCity}`]) {
