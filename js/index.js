@@ -6,7 +6,10 @@ $(document).ready(function() {
     let tempCacheInfo = '';
     let cache = {};
 
+
     getLocation();
+
+
 
     $('button').on('click', function(event) {
 
@@ -29,28 +32,39 @@ $(document).ready(function() {
     });
 
     function getLocation() {
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
+
         } else {
+
             $('.userPosition').html('Location is not supported');
         }
     }
 
     function getWeatherUrl(location) {
+
         return `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/ad5b3ee03304b5b14059582d2a42dbdf/${location}`;
     }
 
     function getCityUrl(location) {
+
         return `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location}&key=${apiKey}`;
     }
 
+    function getByIdUrl(id, key) {
+        return `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json?placeid=${id}&key=${key}`;
+    }
+
     function showPosition(position) {
+
         userPosition = `${position.coords.latitude},${position.coords.longitude}`;
 
         getCityInfo(getCityUrl(userPosition));
     }
 
     function getCityInfo(url) {
+
         fetch(url, {
             method: 'GET'
         }).then(function(response) {
@@ -65,13 +79,16 @@ $(document).ready(function() {
                         break;
                     }
                 }
+
                 cache[`${tempCacheInfo}`] = { name: tempCacheInfo };
                 $('.userCity').html(`Current city: ${tempCacheInfo}`);
+
             }).then(getWeather(getWeatherUrl(userPosition)))
         }).catch(err => console.log(err));
     }
 
     function getWeather(url) {
+
         fetch(url, {
             method: 'GET'
         }).then(function(response) {
@@ -86,7 +103,9 @@ $(document).ready(function() {
     }
 
     function getCityLocation(url) {
+
         let tempId = '';
+
         fetch(url, {
             method: 'GET'
         }).then(function(response) {
@@ -104,18 +123,20 @@ $(document).ready(function() {
 
     var getCityById = function(tempId) {
 
-        fetch(`https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json?placeid=${tempId}&key=${apiLocationKey}`, {
+        fetch(getByIdUrl(tempId, apiLocationKey), {
             method: 'GET'
         }).then(function(response) {
             response.json().then(function(data) {
+
                 let locationObj = data.result.geometry.location;
                 let newLocation = [];
+
                 for (key in locationObj) {
                     newLocation.push(locationObj[key]);
                 }
 
-                getCityInfo(getCityUrl(newLocation.toString()));
                 userPosition = newLocation.toString();
+                getCityInfo(getCityUrl(newLocation.toString()));
             });
         })
     }
