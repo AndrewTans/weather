@@ -11,7 +11,7 @@ $(document).ready(function() {
     $('button').on('click', function(event) {
 
         let inputCity = $('#city').val();
-        userCityUrl = `https://crossorigin.me/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${inputCity}&types=geocode&key=${apiLocationKey}`;
+        userCityUrl = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${inputCity}&types=geocode&key=${apiLocationKey}`;
 
         // check if its on cache already
         if (cache[`${inputCity}`]) {
@@ -20,6 +20,11 @@ $(document).ready(function() {
             $('.temperature').html(`Temperature: ${cache[`${inputCity}`]['temperature']}`)
             return
         }
+
+        $('.userCity').html('Loading City...');
+        $('.cityWeather').html('Loading weather...');
+        $('.temperature').html('Loading temperature...');
+
         getCityLocation(userCityUrl);
     });
 
@@ -32,7 +37,7 @@ $(document).ready(function() {
     }
 
     function getWeatherUrl(location) {
-        return `https://cors.io/?https://api.darksky.net/forecast/ad5b3ee03304b5b14059582d2a42dbdf/${location}`;
+        return `https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/ad5b3ee03304b5b14059582d2a42dbdf/${location}`;
     }
 
     function getCityUrl(location) {
@@ -99,7 +104,7 @@ $(document).ready(function() {
 
     var getCityById = function(tempId) {
 
-        fetch(`https://cors.io/?https://maps.googleapis.com/maps/api/place/details/json?placeid=${tempId}&key=${apiLocationKey}`, {
+        fetch(`https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json?placeid=${tempId}&key=${apiLocationKey}`, {
             method: 'GET'
         }).then(function(response) {
             response.json().then(function(data) {
